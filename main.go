@@ -8,12 +8,7 @@ import (
 )
 
 func main() {
-	// task1 := Task{"Test operation 1", false}
-	// task2 := Task{"Save file 2", false}
-	// todolist := []Task{task1, task2}
-
 	args := os.Args
-	fmt.Println(args)
 	if len(args) == 1 || args[1] == "list" {
 		listTasks()
 	}
