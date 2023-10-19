@@ -5,6 +5,7 @@ import (
 	"fer2ap/cli-go-do-it/util"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -17,6 +18,13 @@ func main() {
 	}
 	if args[1] == "deleteAll" {
 		deleteAll()
+	}
+	if len(args) > 2 && args[1] == "done" {
+		id, err := strconv.Atoi(args[2])
+		if err != nil {
+			panic(err)
+		}
+		markAsDone(id)
 	}
 }
 
@@ -38,6 +46,35 @@ func deleteAll() {
 	fmt.Println("Tasks deleted")
 }
 
+func markAsDone(id int) {
+	filePath, err := util.GetFilePath("tasks")
+	if err != nil {
+		panic(err)
+	}
+	exists, err := util.FileExists(filePath)
+	if err != nil {
+		panic(err)
+	}
+	if exists {
+		tasks, err := recoverTasks()
+		if err != nil {
+			panic(err)
+		}
+		if id > len(tasks)-1 {
+			fmt.Println("There is no such task")
+			return
+		}
+		tasks[id].Done = true
+		err = saveTasks(tasks)
+		if err != nil {
+			panic(err)
+		}
+		printMenu(tasks)
+	} else {
+		fmt.Println("There are no tasks here.")
+	}
+}
+
 func listTasks() {
 	filePath, err := util.GetFilePath("tasks")
 	if err != nil {
@@ -52,7 +89,11 @@ func listTasks() {
 		if err != nil {
 			panic(err)
 		}
-		printMenu(tasks)
+		if len(tasks) == 0 {
+			fmt.Println("There are no tasks here. Use the create method to create your first one, i.e. gdi create")
+		} else {
+			printMenu(tasks)
+		}
 	} else {
 		fmt.Println("There are no tasks here. Use the create method to create your first one, i.e. gdi create")
 	}
